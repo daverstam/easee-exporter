@@ -1,0 +1,19 @@
+---
+easee_base_url: "https://api.easee.cloud/"
+easee_token_url: "https://api.easee.cloud/api/accounts/login"
+easee_products_url: "https://api.easee.cloud/api/accounts/products"
+
+easee_token: ""
+easee_username: ""
+easee_password: ""
+
+# Port the http exporter will be listening on
+exporter_listening_port: 9045
+
+# Set what you wish to collect to true, each metric you enable will increase the scrape duration
+metrics:
+
+# Equalizer:
+  state:
+    collect: true
+    url: "api/equalizers/{}/state"
