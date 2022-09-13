@@ -7,3 +7,6 @@ To get this running you need Prometheus and Python. I'm running my setup on an o
 
 Example image from Grafana:
 ![Easee Home Equalizer in Grafana](https://github.com/daverstam/easee-exporter/blob/main/grafana-img.png?raw=true)
+
+
+API Reference docs: https://developer.easee.cloud/reference/
