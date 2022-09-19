@@ -110,7 +110,7 @@ class easeeMetrics(object):
                     }
                     for metric_name, metric_help in metrics_to_export.items():
                         metrics = GaugeMetricFamily(
-                            f'easee_{k}_{metric_name}',
+                            f'easee_equalizer_{k}_{metric_name}',
                             f'{metric_help}',
                             labels = [
                                 'equalizer_id'
