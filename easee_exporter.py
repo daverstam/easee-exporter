@@ -10,21 +10,20 @@ from prometheus_client.core import GaugeMetricFamily, REGISTRY
 
 class easeeConnection(object):
     def __init__(self):
-        self.easee_base_url = cfg['easee_base_url']
         self.easee_token_url = cfg['easee_token_url']
         self.easee_token = cfg['easee_token']
         self.easee_username = cfg['easee_username']
         self.easee_password = cfg['easee_password']
 
     def request_api_token(self):
-        self.payload = f'''{{"password": "{self.easee_password}", "userName": "{self.easee_username}"}}'''
-        self.headers = {'Accept': 'application/json',
+        payload = f'''{{"password": "{self.easee_password}", "userName": "{self.easee_username}"}}'''
+        headers = {'Accept': 'application/json',
                  'Content-Type': 'application/*+json',
                  'Authorization': f'Bearer {self.easee_token}'}
 
-        self.easee_token_request = requests.post(self.easee_token_url, data=self.payload, headers=self.headers).json()
+        easee_token_request = requests.post(self.easee_token_url, data=payload, headers=headers).json()
 
-        return self.easee_token_request
+        return easee_token_request
 
 class easeeMetrics(object):
     def __init__(self):
@@ -37,23 +36,23 @@ class easeeMetrics(object):
         Returns the ID of any found equalizer
         """
         if not self.easee_token:
-            self.easee_token_response = easeeConnection().request_api_token()
-            self.easee_token = self.easee_token_response['accessToken']
-            self.token_expiry = self.easee_token_response['expiresIn']
-            self.easee_token_creation_time = datetime.datetime.now()
+            easee_token_response = easeeConnection().request_api_token()
+            easee_token = easee_token_response['accessToken']
+            token_expiry = easee_token_response['expiresIn']
+            easee_token_creation_time = datetime.datetime.now()
         elif self.easee_token:
-            if datetime.datetime.now() > (self.easee_token_creation_time + datetime.timedelta(seconds=self.token_expiry)):
-                self.easee_token_response = easeeConnection().request_api_token()
-                self.easee_token = self.easee_token_response['accessToken']
-                self.easee_token_creation_time = datetime.datetime.now()
+            if datetime.datetime.now() > (easee_token_creation_time + datetime.timedelta(seconds=token_expiry)):
+                easee_token_response = easeeConnection().request_api_token()
+                easee_token = easee_token_response['accessToken']
+                easee_token_creation_time = datetime.datetime.now()
 
-        self.headers = {'Accept': 'application/json',
-                        'Authorization': f'Bearer {self.easee_token}'}
-        self.products_response = requests.get(self.easee_products_url, headers=self.headers).json()
+        headers = {'Accept': 'application/json',
+                        'Authorization': f'Bearer {easee_token}'}
+        products_response = requests.get(self.easee_products_url, headers=headers).json()
 
         try:
-            self.equalizer_id = self.products_response[0]['equalizers'][0]['id']
-            return self.equalizer_id
+            equalizer_id = products_response[0]['equalizers'][0]['id']
+            return equalizer_id
         except KeyError:
             return None
 
@@ -62,20 +61,20 @@ class easeeMetrics(object):
         Returns metrics that is set to true in the configuration file
         """
         if not self.easee_token:
-            self.easee_token_response = easeeConnection().request_api_token()
-            self.easee_token = self.easee_token_response['accessToken']
-            self.token_expiry = self.easee_token_response['expiresIn']
-            self.easee_token_creation_time = datetime.datetime.now()
+            easee_token_response = easeeConnection().request_api_token()
+            easee_token = easee_token_response['accessToken']
+            token_expiry = easee_token_response['expiresIn']
+            easee_token_creation_time = datetime.datetime.now()
         elif self.easee_token:
-            if datetime.datetime.now() > (self.easee_token_creation_time + datetime.timedelta(seconds=self.token_expiry)):
-                self.easee_token_response = easeeConnection().request_api_token()
-                self.easee_token = self.easee_token_response['accessToken']
-                self.easee_token_creation_time = datetime.datetime.now()
+            if datetime.datetime.now() > (easee_token_creation_time + datetime.timedelta(seconds=token_expiry)):
+                easee_token_response = easeeConnection().request_api_token()
+                easee_token = easee_token_response['accessToken']
+                easee_token_creation_time = datetime.datetime.now()
 
-        self.headers = {'Authorization': f'Bearer {self.easee_token}'}
-        self.easee_metric_request = requests.get(self.easee_base_url + metric_url, headers=self.headers, timeout=30)
+        headers = {'Authorization': f'Bearer {easee_token}'}
+        easee_metric_request = requests.get(self.easee_base_url + metric_url, headers=headers, timeout=30)
 
-        return self.easee_metric_request
+        return easee_metric_request
 
     def collect(self):
         for k, v in cfg['metrics'].items():
