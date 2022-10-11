@@ -36,18 +36,18 @@ class easeeMetrics(object):
         Returns the ID of any found equalizer
         """
         if not self.easee_token:
-            easee_token_response = easeeConnection().request_api_token()
-            easee_token = easee_token_response['accessToken']
-            token_expiry = easee_token_response['expiresIn']
-            easee_token_creation_time = datetime.datetime.now()
+            self.easee_token_response = easeeConnection().request_api_token()
+            self.easee_token = self.easee_token_response['accessToken']
+            self.token_expiry = self.easee_token_response['expiresIn']
+            self.easee_token_creation_time = datetime.datetime.now()
         elif self.easee_token:
-            if datetime.datetime.now() > (easee_token_creation_time + datetime.timedelta(seconds=token_expiry)):
-                easee_token_response = easeeConnection().request_api_token()
-                easee_token = easee_token_response['accessToken']
-                easee_token_creation_time = datetime.datetime.now()
+            if datetime.datetime.now() > (self.easee_token_creation_time + datetime.timedelta(seconds=self.token_expiry)):
+                self.easee_token_response = easeeConnection().request_api_token()
+                self.easee_token = self.easee_token_response['accessToken']
+                self.easee_token_creation_time = datetime.datetime.now()
 
         headers = {'Accept': 'application/json',
-                        'Authorization': f'Bearer {easee_token}'}
+                        'Authorization': f'Bearer {self.easee_token}'}
         products_response = requests.get(self.easee_products_url, headers=headers).json()
 
         try:
@@ -61,17 +61,12 @@ class easeeMetrics(object):
         Returns metrics that is set to true in the configuration file
         """
         if not self.easee_token:
-            easee_token_response = easeeConnection().request_api_token()
-            easee_token = easee_token_response['accessToken']
-            token_expiry = easee_token_response['expiresIn']
-            easee_token_creation_time = datetime.datetime.now()
+            self.easee_token_response = easeeConnection().request_api_token()
         elif self.easee_token:
-            if datetime.datetime.now() > (easee_token_creation_time + datetime.timedelta(seconds=token_expiry)):
-                easee_token_response = easeeConnection().request_api_token()
-                easee_token = easee_token_response['accessToken']
-                easee_token_creation_time = datetime.datetime.now()
+            if datetime.datetime.now() > (self.easee_token_creation_time + datetime.timedelta(seconds=self.token_expiry)):
+                self.easee_token_response = easeeConnection().request_api_token()
 
-        headers = {'Authorization': f'Bearer {easee_token}'}
+        headers = {'Authorization': f'Bearer {self.easee_token}'}
         easee_metric_request = requests.get(self.easee_base_url + metric_url, headers=headers, timeout=30)
 
         return easee_metric_request
